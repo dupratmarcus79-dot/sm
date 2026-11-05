@@ -4,7 +4,7 @@
 // Empreintes SHA-256 des noms autorisés : les noms complets ne sont pas écrits dans le code public.
 const UTILISATEURS = {
   "4f11608a5fce8b4ae6fc61159e23f95895e27d62fac6dceadf1325d2dfd46693": { id: "marcus", prenom: "Marcus" },
-  "ce7bd0855057c7a3828b55423878eed0b381ddf7059a5e6202201dd881b0f2cd": { id: "shaina", prenom: "Shaina" },
+  "8f9193387ceedb3e9a6f17aa01673b9d391f9921f87dc59bce2fbf1b011d5ce4": { id: "shaina", prenom: "Shaina" },
 };
 const PERSONNES = { marcus: "Marcus", shaina: "Shaina" };
 const CLE = "sm.v1";

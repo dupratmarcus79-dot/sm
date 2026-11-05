@@ -1,6 +1,6 @@
 // Garde l'appli disponible sans réseau. Les cours sont cherchés sur le réseau d'abord.
-const CACHE = "sm-v1";
-const FICHIERS = ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "data/quotes.json"];
+const CACHE = "sm-v2";
+const FICHIERS = ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/logo-splash.jpg", "data/quotes.json"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FICHIERS)).then(() => self.skipWaiting()));

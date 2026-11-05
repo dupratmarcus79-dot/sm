@@ -44,21 +44,14 @@ html.fond-fixe #fond i { animation: none; }
 @keyframes derive3 { to { transform: translate3d(22vw, -24vh, 0) scale(1.22); } }
 
 /* Animation du logo */
-#splash { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--fond); transition: opacity .5s var(--doux), transform .6s var(--doux); }
+#splash { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: #000; transition: opacity .5s var(--doux), transform .6s var(--doux); }
 #splash.sortie { opacity: 0; transform: scale(1.14); pointer-events: none; }
-.logo-anim { width: min(52vw, 230px); overflow: visible; }
-.l-ring { stroke-dasharray: 100; stroke-dashoffset: 100; transform: rotate(-90deg); transform-origin: 252px 268px; animation: trace .95s var(--doux) .1s forwards; }
-.l-tab { opacity: 0; transform: translate(-42px, 42px); animation: languette .45s var(--spring) .85s forwards; }
-.l-m path { opacity: 0; transform: translateY(70px) scaleY(.5); transform-origin: 322px 352px; animation: lame .55s var(--spring) forwards; }
-.l-m path:nth-child(1) { animation-delay: .55s; } .l-m path:nth-child(2) { animation-delay: .6s; }
-.l-m path:nth-child(3) { animation-delay: .66s; } .l-m path:nth-child(4) { animation-delay: .7s; }
-.l-m path:nth-child(5) { animation-delay: .76s; } .l-m path:nth-child(6) { animation-delay: .8s; }
-.l-s { stroke-dasharray: 100; stroke-dashoffset: 100; animation: trace .8s var(--doux) .75s forwards; filter: drop-shadow(0 0 16px rgba(200, 255, 46, .5)); }
-.logo-anim { animation: battement .55s var(--spring) 1.45s; }
-@keyframes trace { to { stroke-dashoffset: 0; } }
-@keyframes languette { to { opacity: 1; transform: none; } }
-@keyframes lame { to { opacity: 1; transform: none; } }
-@keyframes battement { 40% { transform: scale(1.07); } }
+.logo-anim { position: relative; width: min(74vw, 340px); aspect-ratio: 1; overflow: hidden; border-radius: 50%; opacity: 0; transform: scale(.72) rotate(-7deg); filter: blur(14px) brightness(.4); animation: logo-entre 1.15s var(--spring) .1s forwards, logo-lueur 1.1s ease-in-out 1.2s; }
+.logo-anim img { width: 100%; height: 100%; display: block; }
+.eclat { position: absolute; inset: -20%; background: linear-gradient(112deg, transparent 42%, rgba(255, 233, 170, .75) 50%, transparent 58%); mix-blend-mode: screen; transform: translateX(-85%); animation: eclat 1s var(--doux) .95s forwards; }
+@keyframes logo-entre { to { opacity: 1; transform: none; filter: blur(0) brightness(1); } }
+@keyframes logo-lueur { 45% { filter: brightness(1.28) drop-shadow(0 0 26px rgba(245, 196, 81, .55)); } }
+@keyframes eclat { to { transform: translateX(85%); } }
 
 /* Écrans */
 #app { position: fixed; inset: 0; z-index: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(var(--haut) + 18px) 18px calc(var(--bas) + 112px); }
