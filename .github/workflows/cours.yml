@@ -1,0 +1,18 @@
+name: Cours de bourse
+on:
+  schedule:
+    - cron: "30 21 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  maj:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/update_quotes.py
+      - run: |
+          git config user.name "cours-bot"
+          git config user.email "cours-bot@users.noreply.github.com"
+          git add data/quotes.json
+          git diff --cached --quiet || (git commit -m "Cours du jour" && git push)
