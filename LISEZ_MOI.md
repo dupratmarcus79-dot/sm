@@ -1,6 +1,6 @@
 # SM
 
-Appli web installable de Shaina et Marcus. Aucune dépendance à installer, aucune clé secrète.
+Appli web publique, réservée à deux personnes : Shaina et Marcus. Aucune dépendance à installer, aucune clé secrète.
 
 - `index.html`, `styles.css`, `app.js` : l'appli.
 - `sw.js`, `manifest.webmanifest` : installation sur le téléphone et mode hors ligne.

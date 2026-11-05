@@ -225,7 +225,8 @@ function ecranBienvenue() {
     ecranMdp();
   };
   ecran([logoMini(), h("h1", {}, "Bienvenue"), h("p", { class: "sous" }, "Inscris-toi avec ton nom ou ton email."),
-    h("form", { onsubmit: valider }, h("label", { class: "champ" }, champ), err, h("button", { class: "bouton", type: "submit" }, "S'inscrire"))], true);
+    h("form", { onsubmit: valider }, h("label", { class: "champ" }, champ), err, h("button", { class: "bouton", type: "submit" }, "S'inscrire")),
+    h("p", { class: "note", style: "margin-top:16px;text-align:center" }, "Appli publique, réservée à deux personnes.")], true);
 }
 function ecranMdp() {
   const a = h("input", { type: "password", autocomplete: "new-password", placeholder: "8 caractères minimum", "aria-label": "Mot de passe" });
