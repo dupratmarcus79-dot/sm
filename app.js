@@ -7,6 +7,7 @@ const UTILISATEURS = {
   "8f9193387ceedb3e9a6f17aa01673b9d391f9921f87dc59bce2fbf1b011d5ce4": { id: "shaina", prenom: "Shaina" },
 };
 const PERSONNES = { marcus: "Marcus", shaina: "Shaina" };
+const COULEURS = [["lime", "#c8ff2e", "#19e3c8", "Vert lime"], ["turquoise", "#19e3c8", "#3b82ff", "Bleu turquoise"], ["bleu", "#2f7bff", "#19d3e3", "Bleu"], ["violet", "#8b5cff", "#ff4fd8", "Violet"], ["rose", "#ff4fa3", "#ffa26b", "Rose"], ["rouge", "#ff3b4e", "#ff9a3c", "Rouge"], ["orange", "#ff8a1f", "#ffd23c", "Orange"], ["jaune", "#ffd60a", "#ff8a1f", "Jaune"], ["or", "#f5c451", "#b8862b", "Or"]];
 const CLE = "sm.v1";
 const ITERATIONS = 310000;
 const VERROU_APRES_MS = 60000;
@@ -157,7 +158,8 @@ function appliquerPrefs() {
   r.dataset.theme = S.prefs.theme;
   r.dataset.accent = S.prefs.accent;
   r.classList.toggle("fond-fixe", !S.prefs.fond);
-  document.querySelector('meta[name="theme-color"]').content = S.prefs.theme === "noir" ? "#07090b" : "#f3f5f4";
+  const accent = (COULEURS.find((c) => c[0] === S.prefs.accent) || COULEURS[0])[1];
+  document.querySelector('meta[name="theme-color"]').content = S.prefs.theme === "blanc" ? "#f7f8f8" : S.prefs.theme === "vif" ? accent : "#0b0e12";
 }
 
 /* ---------- Mot de passe et Face ID ---------- */
@@ -533,9 +535,8 @@ function vueReglages() {
     h("div", { class: "carte" }, h("div", { class: "compte" }, h("div", { class: "avatar" }, S.profil.prenom[0]), h("div", {}, h("div", { class: "nom" }, S.profil.nom), h("div", { class: "sous" }, "Données gardées sur ce téléphone")))),
     h("p", { class: "section" }, "Apparence"),
     h("div", { class: "carte" },
-      segment([["noir", "Noir"], ["blanc", "Blanc"]], S.prefs.theme, (id) => { S.prefs.theme = id; sauver(); appliquerPrefs(); vueReglages(); }),
-      h("div", { class: "reglage" }, h("span", {}, "Couleur"), h("div", { class: "couleurs" },
-        [["lime", "#c8ff2e", "Vert lime"], ["turquoise", "#19e3c8", "Bleu turquoise"]].map(([id, c, nom]) => h("button", { class: "couleur" + (S.prefs.accent === id ? " actif" : ""), style: `background:${c}`, "aria-label": nom, onclick: () => { S.prefs.accent = id; sauver(); appliquerPrefs(); vueReglages(); } })))),
+      segment([["noir", "Noir"], ["blanc", "Blanc"], ["vif", "Vif"]], S.prefs.theme, (id) => { S.prefs.theme = id; sauver(); appliquerPrefs(); vueReglages(); }),
+      h("div", { class: "couleurs" }, COULEURS.map(([id, c1, c2, nom]) => h("button", { class: "couleur" + (S.prefs.accent === id ? " actif" : ""), style: `background:linear-gradient(135deg,${c1},${c2})`, "aria-label": nom, onclick: () => { S.prefs.accent = id; sauver(); appliquerPrefs(); vueReglages(); } }))),
       h("div", { class: "reglage" }, h("span", {}, "Fond animé"), inter(S.prefs.fond, () => { S.prefs.fond = !S.prefs.fond; sauver(); appliquerPrefs(); vueReglages(); }))),
     h("p", { class: "section" }, "Sécurité"),
     h("div", { class: "carte" }, blocFace,
