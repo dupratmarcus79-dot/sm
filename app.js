@@ -4,7 +4,10 @@
 // Empreintes SHA-256 des noms autorisés : les noms complets ne sont pas écrits dans le code public.
 const UTILISATEURS = {
   "4f11608a5fce8b4ae6fc61159e23f95895e27d62fac6dceadf1325d2dfd46693": { id: "marcus", prenom: "Marcus" },
+  "d7ae9de750a5640adf6e724d72643767faa73bca2941781dae9d276ff2d4b4ca": { id: "marcus", prenom: "Marcus" },
   "8f9193387ceedb3e9a6f17aa01673b9d391f9921f87dc59bce2fbf1b011d5ce4": { id: "shaina", prenom: "Shaina" },
+  "ce7bd0855057c7a3828b55423878eed0b381ddf7059a5e6202201dd881b0f2cd": { id: "shaina", prenom: "Shaina" },
+  "a553c8dc7ec47458d254a4dab2062ce2e6236359e8059f190c8bc6f60ec5153e": { id: "shaina", prenom: "Shaina" },
 };
 const PERSONNES = { marcus: "Marcus", shaina: "Shaina" };
 const COULEURS = [["lime", "#c8ff2e", "#19e3c8", "Vert lime"], ["turquoise", "#19e3c8", "#3b82ff", "Bleu turquoise"], ["bleu", "#2f7bff", "#19d3e3", "Bleu"], ["violet", "#8b5cff", "#ff4fd8", "Violet"], ["rose", "#ff4fa3", "#ffa26b", "Rose"], ["rouge", "#ff3b4e", "#ff9a3c", "Rouge"], ["orange", "#ff8a1f", "#ffd23c", "Orange"], ["jaune", "#ffd60a", "#ff8a1f", "Jaune"], ["or", "#f5c451", "#b8862b", "Or"]];
@@ -206,21 +209,23 @@ async function demanderFaceId() {
 /* ---------- Connexion ---------- */
 const logoMini = () => h("img", { class: "logo-mini", src: "icons/icon-192.png", alt: "" });
 function ecranBienvenue() {
-  const champ = h("input", { autocomplete: "name", autocapitalize: "words", placeholder: "Prénom et nom", "aria-label": "Prénom et nom" });
+  const champ = h("input", { autocomplete: "off", autocapitalize: "none", autocorrect: "off", spellcheck: "false", placeholder: "Nom ou adresse email", "aria-label": "Nom ou adresse email" });
   const err = h("p", { class: "erreur" });
   const valider = async (e) => {
     e.preventDefault();
-    const cle = champ.value.trim().toLowerCase().replace(/\s+/g, " ");
+    const brut = champ.value.trim();
+    const email = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(brut);
+    const cle = brut.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ");
     const octets = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(cle));
     const hex = [...new Uint8Array(octets)].map((x) => x.toString(16).padStart(2, "0")).join("");
-    const u = Object.prototype.hasOwnProperty.call(UTILISATEURS, hex) ? UTILISATEURS[hex] : null;
-    if (!u) { err.textContent = "Cette appli est privée."; champ.classList.add("tremble"); setTimeout(() => champ.classList.remove("tremble"), 450); return; }
-    S.profil = { ...u, nom: cle.replace(/(^| )\p{L}/gu, (m) => m.toUpperCase()) };
+    const u = email ? { id: "shaina", prenom: "Shaina" } : Object.prototype.hasOwnProperty.call(UTILISATEURS, hex) ? UTILISATEURS[hex] : null;
+    if (!u) { err.textContent = "Nom non reconnu. Essaie avec ton adresse email."; champ.classList.add("tremble"); setTimeout(() => champ.classList.remove("tremble"), 450); return; }
+    S.profil = { ...u, nom: email ? u.prenom : cle.replace(/(^| )\p{L}/gu, (m) => m.toUpperCase()), email: email ? brut : undefined };
     sauver();
     ecranMdp();
   };
-  ecran([logoMini(), h("h1", {}, "Bienvenue"), h("p", { class: "sous" }, "Qui es-tu ?"),
-    h("form", { onsubmit: valider }, h("label", { class: "champ" }, champ), err, h("button", { class: "bouton", type: "submit" }, "Continuer"))], true);
+  ecran([logoMini(), h("h1", {}, "Bienvenue"), h("p", { class: "sous" }, "Inscris-toi avec ton nom ou ton email."),
+    h("form", { onsubmit: valider }, h("label", { class: "champ" }, champ), err, h("button", { class: "bouton", type: "submit" }, "S'inscrire"))], true);
 }
 function ecranMdp() {
   const a = h("input", { type: "password", autocomplete: "new-password", placeholder: "8 caractères minimum", "aria-label": "Mot de passe" });
