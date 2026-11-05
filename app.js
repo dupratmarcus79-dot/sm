@@ -21,12 +21,13 @@ const I = {
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   commun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.8 3-6 6.5-6s5.900 2.200 6.500 6"/><path d="M16 4.800a3.500 3.500 0 0 1 0 6.400M18 14.500c1.900.8 3.100 2.600 3.500 5.500"/></svg>',
   personne: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.400 3.800-7 8-7s7.200 2.600 8 7"/></svg>',
+  banque: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/></svg>',
   face: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M8.500 9v1.500M15.500 9v1.500M12 9v4h-1M9 16c1.800 1.300 4.200 1.300 6 0"/></svg>',
 };
 
 /* ---------- Données ---------- */
 function etatVide() {
-  return { profil: null, auth: null, faceid: null, prefs: { theme: "noir", accent: "lime", fond: true }, investissements: [], objectifs: [], supprimes: [] };
+  return { profil: null, auth: null, faceid: null, prefs: { theme: "noir", accent: "lime", fond: true, liens: {} }, investissements: [], objectifs: [], supprimes: [] };
 }
 function charger() {
   try {
@@ -312,7 +313,8 @@ function vueAccueil() {
     h("div", { class: "actions" },
       h("button", { class: "pastille forte", onclick: () => feuilleAjout("perso") }, h("span", { icone: I.plus }), "Ajouter"),
       h("button", { class: "pastille", onclick: () => { vueCompte = "commun"; aller("investir"); } }, h("span", { icone: I.commun }), "Commun"),
-      h("button", { class: "pastille", onclick: () => aller("reves") }, h("span", { icone: I.reves }), "Rêves")),
+      h("button", { class: "pastille", onclick: () => aller("reves") }, h("span", { icone: I.reves }), "Rêves"),
+      h("button", { class: "pastille", onclick: () => ouvrirLien("banque") }, h("span", { icone: I.banque }), "Banque")),
     items.length ? h("div", { class: "defile" }, h("div", { class: "defile-piste" }, items, items.map((x) => x.cloneNode(true)))) : null,
     h("p", { class: "section" }, "Comptes"),
     h("div", { class: "pile" },
@@ -349,9 +351,50 @@ function vueInvestir() {
     vueCompte === "commun" ? partsCommun() : null,
     h("p", { class: "section" }, "Lignes"),
     lignes.length ? h("div", { class: "pile" }, lignes) : h("p", { class: "note" }, modifiable ? "Rien pour l'instant. Ajoute ta première ligne." : `Rien de reçu de ${PERSONNES[autre()]}. Passe par Réglages pour échanger vos chiffres.`),
+    h("p", { class: "section" }, "Mes comptes réels"),
+    h("div", { class: "pile" }, carteLien("banque"), carteLien("courtier")),
     h("p", { class: "note", style: "margin-top:16px" }, "Suivi uniquement. Aucun argent réel ne passe par l'appli : tu notes ici ce que tu investis chez ton courtier."),
   ].filter(Boolean));
   compteur(montant, b.val, (v) => euros(v));
+}
+/* Liens vers la banque et le courtier : aucun RIB, aucun identifiant n'est gardé ici. */
+const LIENS = { banque: "Ma banque", courtier: "Mon courtier" };
+const lien = (type) => (S.prefs.liens || {})[type];
+function adresseSure(texte) {
+  const brut = texte.trim();
+  if (!brut || brut.length > 200 || /\s/.test(brut)) return null;
+  try {
+    const u = new URL(/^[a-z][a-z0-9+.-]*:/i.test(brut) ? brut : "https://" + brut);
+    return u.protocol === "https:" && u.hostname.includes(".") && !u.username && !u.password ? u.href : null;
+  } catch { return null; }
+}
+function ouvrirLien(type) {
+  const l = lien(type);
+  if (l) window.open(l.url, "_blank", "noopener,noreferrer");
+  else feuilleLien(type);
+}
+function carteLien(type) {
+  const l = lien(type);
+  return h("button", { class: "carte", onclick: () => ouvrirLien(type) }, h("div", { class: "compte" }, h("div", { class: "icone", icone: I.banque }),
+    h("div", { class: "milieu" }, h("div", { class: "nom tronque" }, l ? l.nom : LIENS[type]), h("div", { class: "sous tronque" }, l ? new URL(l.url).hostname : "Ajouter le lien")),
+    h("div", { class: "droite sous" }, "›")));
+}
+function feuilleLien(type) {
+  const l = lien(type);
+  const nom = h("input", { maxlength: 40, placeholder: type === "banque" ? "Ma banque" : "Mon courtier", value: l ? l.nom : "", "aria-label": "Nom" });
+  const adr = h("input", { inputmode: "url", autocapitalize: "none", autocomplete: "off", placeholder: "www.ma-banque.fr", value: l ? l.url : "", "aria-label": "Adresse du site" });
+  const err = h("p", { class: "erreur" });
+  const liens = () => { S.prefs.liens = S.prefs.liens || {}; return S.prefs.liens; };
+  feuille([h("h2", {}, LIENS[type]),
+    h("p", { class: "note", style: "margin-bottom:14px" }, "Copie l'adresse officielle depuis ton navigateur. N'écris jamais ton RIB, ton identifiant ou ton mot de passe ici."),
+    h("form", { onsubmit: (e) => {
+      e.preventDefault();
+      const url = adresseSure(adr.value);
+      if (!url) { err.textContent = "Indique une adresse sécurisée en https."; return; }
+      liens()[type] = { nom: nom.value.trim() || LIENS[type], url };
+      sauver(); fermerFeuille(); toast("Lien enregistré"); aller(onglet);
+    } }, h("label", { class: "champ" }, "Nom", nom), h("label", { class: "champ" }, "Adresse du site", adr), err, h("button", { class: "bouton", type: "submit" }, "Enregistrer")),
+    l ? h("button", { class: "bouton danger", onclick: () => { delete liens()[type]; sauver(); fermerFeuille(); aller(onglet); } }, "Retirer ce lien") : null].filter(Boolean));
 }
 function partsCommun() {
   const l = invCommun(), tot = l.reduce((t, i) => t + i.montant, 0);
@@ -542,6 +585,8 @@ function vueReglages() {
     h("div", { class: "carte" }, blocFace,
       h("button", { class: "reglage", onclick: feuilleChangerMdp }, h("span", {}, "Changer le mot de passe"), h("span", { class: "sous" }, "›")),
       h("button", { class: "reglage", onclick: verrouiller }, h("span", {}, "Verrouiller maintenant"), h("span", { class: "sous" }, "›"))),
+    h("p", { class: "section" }, "Mes comptes réels"),
+    h("div", { class: "carte" }, Object.keys(LIENS).map((t) => h("button", { class: "reglage", onclick: () => feuilleLien(t) }, h("span", {}, LIENS[t]), h("span", { class: "sous" }, lien(t) ? lien(t).nom + " ›" : "Ajouter ›")))),
     h("p", { class: "section" }, `Échanger avec ${PERSONNES[autre()]}`),
     h("div", { class: "carte" },
       h("button", { class: "reglage", onclick: exporter }, h("span", {}, "Envoyer mes chiffres"), h("span", { class: "sous" }, "›")),

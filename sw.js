@@ -1,5 +1,5 @@
 // Garde l'appli disponible sans réseau. Les cours sont cherchés sur le réseau d'abord.
-const CACHE = "sm-v3";
+const CACHE = "sm-v4";
 const FICHIERS = ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/logo-splash.jpg", "data/quotes.json"];
 
 self.addEventListener("install", (e) => {
